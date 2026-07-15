@@ -75,8 +75,7 @@ preparing a fresh release dataset.
 ## Training
 
 The main script exposes paths through environment variables and otherwise uses the paper
-configuration: Qwen2.5-3B-Instruct, five trajectories per question, three searches,
-`lambda=0.5`, sign-consistency gating, and 200 optimization steps.
+configuration: Qwen2.5-3B-Instruct, five trajectories per question, three searches and sign-consistency gating.
 
 ```bash
 BASE_MODEL=Qwen/Qwen2.5-3B-Instruct \
