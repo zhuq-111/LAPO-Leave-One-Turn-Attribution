@@ -5,16 +5,31 @@ Process Rewards in Multi-Turn Search Reasoning** on top of VERL/Search-R1.
 
 ## Algorithm-to-code map
 
-| Paper component | Implementation |
-| --- | --- |
-| Multi-turn search rollout | `lapo/llm_agent/generation.py` |
-| Gold-answer mean log-likelihood (Eq. 5) | `LLMGenerationManager._score_lapo_rows` |
-| Backward `[DELETE]` counterfactual (Eq. 6) | `LLMGenerationManager._compute_counterfactual_ig_rewards` |
-| F1 terminal reward and GRPO outcome advantage (Eqs. 7–8) | `verl/trainer/main_ppo.py`, `lapo/algorithm.py` |
-| Robust scaling, tanh, group normalization, and sign gate (Eqs. 9–13) | `lapo/algorithm.py` |
-| Token-level outcome + process advantage (Eq. 14) | `verl/trainer/main_ppo.py` |
-| Clipped GRPO optimization | `verl/trainer/ppo/core_algos.py` |
-| Paper prompt templates | `lapo/prompts.py` |
+```text
+LAPO/
+├── lapo/
+│   ├── llm_agent/
+│   │   └── generation.py
+│   │       └── LLMGenerationManager
+│   │           ├── Multi-turn search rollout
+│   │           ├── _score_lapo_rows
+│   │           │   └── Gold-answer mean log-likelihood (Eq. 5)
+│   │           └── _compute_counterfactual_ig_rewards
+│   │               └── Backward [DELETE] counterfactual (Eq. 6)
+│   ├── algorithm.py
+│   │   ├── F1 terminal reward and GRPO outcome advantage (Eqs. 7–8)
+│   │   └── Robust scaling, tanh, group normalization, and sign gate (Eqs. 9–13)
+│   └── prompts.py
+│       └── Paper prompt templates
+└── verl/
+    └── trainer/
+        ├── main_ppo.py
+        │   ├── F1 terminal reward and GRPO outcome advantage (Eqs. 7–8)
+        │   └── Token-level outcome + process advantage (Eq. 14)
+        └── ppo/
+            └── core_algos.py
+                └── Clipped GRPO optimization
+```
 
 The numerical LAPO equations are isolated in `lapo/algorithm.py`; they do not import
 Ray, Torch, or trainer code and can be unit-tested independently.
