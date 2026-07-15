@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.log
+*.bak
+*.bak.*
+*.bak_*
+*.bak-*
+.wandb.env
+.env
+.idea/
+.vscode/
+.pytest_cache/
+.ruff_cache/
+outputs/
+wandb/
+verl_checkpoints/

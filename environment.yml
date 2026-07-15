@@ -1,0 +1,10 @@
+name: lapo
+channels:
+  - defaults
+dependencies:
+  - python=3.9.25
+  - pip
+
+# Install the pinned Python packages after creating this environment. Keeping
+# pip installation explicit is necessary because flash-attn must be installed
+# without build isolation after PyTorch is present.

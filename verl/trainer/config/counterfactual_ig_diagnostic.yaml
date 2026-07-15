@@ -1,0 +1,15 @@
+defaults:
+  - ppo_trainer
+  - _self_
+
+diagnostic:
+  data_file: data/nq_search/test.parquet
+  split: head
+  start_index: 0
+  num_questions: 4
+  indices: null
+  n_rollouts: 4
+  seed: 42
+  do_sample: true
+  output_dir: outputs/counterfactual_ig_diagnostic
+

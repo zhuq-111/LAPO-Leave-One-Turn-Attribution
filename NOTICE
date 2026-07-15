@@ -1,0 +1,13 @@
+LAPO
+Copyright 2026 LAPO Authors
+
+This product includes software derived from VERL, originally developed by
+ByteDance Ltd. and/or its affiliates and distributed under the Apache License 2.0.
+https://github.com/volcengine/verl
+
+This product includes software adapted from Search-R1 and distributed under the
+Apache License 2.0.
+https://github.com/PeterGriffinJin/Search-R1
+
+The names and trademarks of upstream projects and contributors are used only to
+describe the origin of incorporated software. They do not imply endorsement.
