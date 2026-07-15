@@ -31,13 +31,12 @@ conda activate lapo
 # Install PyTorch first so flash-attn can compile against the active Torch/CUDA ABI.
 python -m pip install torch==2.4.0 torchvision==0.19.0
 python -m pip install flash-attn==2.8.2 --no-build-isolation
-python -m pip install -r requirements-lock.txt
+python -m pip install -r requirements.txt
 python -m pip check
 ```
 
-`requirements.txt` lists the direct dependencies for readability, while
-`requirements-lock.txt` reproduces the complete training environment. The source
-server used a prebuilt `flash-attn` wheel for Python 3.9, Torch 2.4, and CUDA 12;
+`requirements.txt` lists pinned direct dependencies for the training environment.
+The source server used a prebuilt `flash-attn` wheel for Python 3.9, Torch 2.4, and CUDA 12;
 using a matching wheel is preferable when one is available.
 
 The retrieval server is a separate environment: the captured training environment
