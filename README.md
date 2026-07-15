@@ -13,19 +13,19 @@ LAPO/
 │   │       └── LLMGenerationManager
 │   │           ├── Multi-turn search rollout
 │   │           ├── _score_lapo_rows
-│   │           │   └── Gold-answer mean log-likelihood (Eq. 5)
+│   │           │   └── Gold-answer mean log-likelihood
 │   │           └── _compute_counterfactual_ig_rewards
-│   │               └── Backward [DELETE] counterfactual (Eq. 6)
+│   │               └── Backward [DELETE] counterfactual
 │   ├── algorithm.py
-│   │   ├── F1 terminal reward and GRPO outcome advantage (Eqs. 7–8)
-│   │   └── Robust scaling, tanh, group normalization, and sign gate (Eqs. 9–13)
+│   │   ├── F1 terminal reward and GRPO outcome advantage
+│   │   └── Robust scaling, tanh, group normalization, and sign gate
 │   └── prompts.py
 │       └── Paper prompt templates
 └── verl/
     └── trainer/
         ├── main_ppo.py
-        │   ├── F1 terminal reward and GRPO outcome advantage (Eqs. 7–8)
-        │   └── Token-level outcome + process advantage (Eq. 14)
+        │   ├── F1 terminal reward and GRPO outcome advantage
+        │   └── Token-level outcome + process advantage
         └── ppo/
             └── core_algos.py
                 └── Clipped GRPO optimization
