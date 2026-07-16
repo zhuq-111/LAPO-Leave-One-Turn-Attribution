@@ -1,4 +1,4 @@
-# Copyright 2026 LAPO Authors
+# Copyright 2026 LOTAPO Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ import math
 import numpy as np
 import torch.nn.functional as F
 from verl.utils.reward_score import qa_em
-from lapo.prompts import GOLD_ANSWER_PREFIX, GOLD_ANSWER_SUFFIX
-from lapo.algorithm import replace_token_span
+from lotapo.prompts import GOLD_ANSWER_PREFIX, GOLD_ANSWER_SUFFIX
+from lotapo.algorithm import replace_token_span
 
 @dataclass
 class GenerationConfig:
@@ -50,8 +50,8 @@ class GenerationConfig:
     use_counterfactual_ig: bool = False
     ig_eps: float = 1e-6
     disable_old_gt_ig: bool = True
-    lapo_score_type: str = "logprob"
-    lapo_score_direction: str = "backward"
+    lotapo_score_type: str = "logprob"
+    lotapo_score_direction: str = "backward"
 
 
 GT_ANSWER_PREFIX = "<think>Now I can answer the question.</think>\n<answer>"
@@ -425,7 +425,7 @@ class LLMGenerationManager:
             return [], 0, 0
         return token_ids, score_start, score_end
 
-    def _score_lapo_rows(self, log_prob_output: DataProto, row_score_spans: List[Tuple[int, int]],
+    def _score_lotapo_rows(self, log_prob_output: DataProto, row_score_spans: List[Tuple[int, int]],
                          score_type: str) -> Tuple[List[float], List[float]]:
         old_log_probs = log_prob_output.batch['old_log_probs'].detach().cpu()
         row_logprob_scores = []
@@ -450,7 +450,7 @@ class LLMGenerationManager:
             return row_logprob_scores, row_process_scores
 
         if 'logits' not in log_prob_output.batch:
-            raise RuntimeError(f"LAPO score_type={score_type} requires logits from compute_log_prob.")
+            raise RuntimeError(f"LOTAPO score_type={score_type} requires logits from compute_log_prob.")
 
         logits = log_prob_output.batch['logits'].detach().cpu().float()
         row_process_scores = []
@@ -471,7 +471,7 @@ class LLMGenerationManager:
                 row_process_scores.append(float('nan'))
         return row_logprob_scores, row_process_scores
 
-    def _compute_lapo_raw_score(self, score_type: str, full_idx: int, minus_idx: int,
+    def _compute_lotapo_raw_score(self, score_type: str, full_idx: int, minus_idx: int,
                                 row_logprob_scores: List[float],
                                 row_process_scores: List[float],
                                 logits: torch.Tensor = None,
@@ -496,7 +496,7 @@ class LLMGenerationManager:
             kl = torch.sum(p_full * (logp_full - logp_minus), dim=-1)
             raw = float(kl.mean().item()) if kl.numel() else 0.0
         else:
-            raise ValueError(f"Unsupported LAPO score_type: {score_type}")
+            raise ValueError(f"Unsupported LOTAPO score_type: {score_type}")
         return 0.0 if not np.isfinite(raw) else float(raw)
 
     def _compute_counterfactual_ig_rewards(self, final_output: DataProto, ground_truths: List[Any]) -> Dict[str, Any]:
@@ -509,20 +509,20 @@ class LLMGenerationManager:
         ig_target_sources = ['none' for _ in range(batch_size)]
         full_target_log_probs = [None for _ in range(batch_size)]
         deleted_target_log_probs = [[] for _ in range(batch_size)]
-        lapo_score_type = str(getattr(self.config, 'lapo_score_type', 'logprob')).lower()
-        if lapo_score_type not in ('logprob', 'kl', 'entropy'):
-            raise ValueError(f"Unsupported algorithm.lapo_score_type={lapo_score_type}. Expected logprob, kl, or entropy.")
-        lapo_score_direction = str(getattr(self.config, 'lapo_score_direction', 'backward')).lower()
-        if lapo_score_direction not in ('backward', 'forward'):
-            raise ValueError(f"Unsupported algorithm.lapo_score_direction={lapo_score_direction}. Expected backward or forward.")
+        lotapo_score_type = str(getattr(self.config, 'lotapo_score_type', 'logprob')).lower()
+        if lotapo_score_type not in ('logprob', 'kl', 'entropy'):
+            raise ValueError(f"Unsupported algorithm.lotapo_score_type={lotapo_score_type}. Expected logprob, kl, or entropy.")
+        lotapo_score_direction = str(getattr(self.config, 'lotapo_score_direction', 'backward')).lower()
+        if lotapo_score_direction not in ('backward', 'forward'):
+            raise ValueError(f"Unsupported algorithm.lotapo_score_direction={lotapo_score_direction}. Expected backward or forward.")
 
         if not self.config.use_counterfactual_ig or not ground_truths:
             return {
                 'turn_ig_rewards': turn_ig_rewards,
                 'raw_ig_values': raw_ig_values,
                 'raw_process_scores': raw_process_scores,
-                'lapo_score_type': [lapo_score_type for _ in range(batch_size)],
-                'lapo_score_direction': [lapo_score_direction for _ in range(batch_size)],
+                'lotapo_score_type': [lotapo_score_type for _ in range(batch_size)],
+                'lotapo_score_direction': [lotapo_score_direction for _ in range(batch_size)],
                 'final_rewards': final_rewards,
                 'ig_enabled': ig_enabled,
                 'ig_target_sources': ig_target_sources,
@@ -574,7 +574,7 @@ class LLMGenerationManager:
                         break
 
             sample_start = len(contexts)
-            if lapo_score_direction == "backward":
+            if lotapo_score_direction == "backward":
                 contexts.append(context_full)
             process_turn_indices = []
             for turn_idx, (start, end) in enumerate(turn_spans):
@@ -591,7 +591,7 @@ class LLMGenerationManager:
                     continue
                 span_start = max(0, min(int(start), target_insert_pos))
                 span_end = max(span_start, min(int(end), target_insert_pos))
-                if lapo_score_direction == "backward":
+                if lotapo_score_direction == "backward":
                     if span_start >= span_end:
                         context_minus = list(context_full)
                     else:
@@ -606,7 +606,7 @@ class LLMGenerationManager:
                     context_after = valid_prompt_ids + response_before_answer_ids[:span_end]
                     contexts.extend([context_before, context_after])
                 process_turn_indices.append(turn_idx)
-            if lapo_score_direction == "forward" and not process_turn_indices:
+            if lotapo_score_direction == "forward" and not process_turn_indices:
                 continue
             row_meta.append((i, sample_start, len(turn_spans), process_turn_indices, target_ids, score_start, score_end))
 
@@ -615,8 +615,8 @@ class LLMGenerationManager:
                 'turn_ig_rewards': turn_ig_rewards,
                 'raw_ig_values': raw_ig_values,
                 'raw_process_scores': raw_process_scores,
-                'lapo_score_type': [lapo_score_type for _ in range(batch_size)],
-                'lapo_score_direction': [lapo_score_direction for _ in range(batch_size)],
+                'lotapo_score_type': [lotapo_score_type for _ in range(batch_size)],
+                'lotapo_score_direction': [lotapo_score_direction for _ in range(batch_size)],
                 'final_rewards': final_rewards,
                 'ig_enabled': ig_enabled,
                 'ig_target_sources': ig_target_sources,
@@ -630,8 +630,8 @@ class LLMGenerationManager:
                 'turn_ig_rewards': turn_ig_rewards,
                 'raw_ig_values': raw_ig_values,
                 'raw_process_scores': raw_process_scores,
-                'lapo_score_type': [lapo_score_type for _ in range(batch_size)],
-                'lapo_score_direction': [lapo_score_direction for _ in range(batch_size)],
+                'lotapo_score_type': [lotapo_score_type for _ in range(batch_size)],
+                'lotapo_score_direction': [lotapo_score_direction for _ in range(batch_size)],
                 'final_rewards': final_rewards,
                 'ig_enabled': ig_enabled,
                 'ig_target_sources': ig_target_sources,
@@ -645,7 +645,7 @@ class LLMGenerationManager:
             row_answers, row_score_spans = [], []
             expanded_meta = []
             for sample_idx, start, num_turns, process_turn_indices, answer_ids, score_start, score_end in row_meta:
-                num_variants = len(process_turn_indices) + 1 if lapo_score_direction == "backward" else len(process_turn_indices) * 2
+                num_variants = len(process_turn_indices) + 1 if lotapo_score_direction == "backward" else len(process_turn_indices) * 2
                 for _ in range(num_variants):
                     row_answers.append(answer_ids)
                     row_score_spans.append((score_start, score_end))
@@ -673,17 +673,17 @@ class LLMGenerationManager:
                 'temperature': self.config.temperature,
                 'use_dynamic_bsz': self.config.log_prob_use_dynamic_bsz,
             })
-            if lapo_score_type == 'kl':
-                logprob_batch.meta_info['return_logits_for_lapo'] = True
-            elif lapo_score_type == 'entropy':
-                logprob_batch.meta_info['return_entropy_for_lapo'] = True
+            if lotapo_score_type == 'kl':
+                logprob_batch.meta_info['return_logits_for_lotapo'] = True
+            elif lotapo_score_type == 'entropy':
+                logprob_batch.meta_info['return_entropy_for_lotapo'] = True
             log_prob_output = self._compute_log_prob_with_gpu_padding(logprob_batch)
 
-        row_logprob_scores, row_scores = self._score_lapo_rows(log_prob_output, row_score_spans, lapo_score_type)
-        logits = log_prob_output.batch['logits'].detach().cpu().float() if lapo_score_type == "kl" else None
+        row_logprob_scores, row_scores = self._score_lotapo_rows(log_prob_output, row_score_spans, lotapo_score_type)
+        logits = log_prob_output.batch['logits'].detach().cpu().float() if lotapo_score_type == "kl" else None
 
         for sample_idx, start, num_turns, process_turn_indices in expanded_meta:
-            if lapo_score_direction == "backward":
+            if lotapo_score_direction == "backward":
                 s_full = row_logprob_scores[start]
             elif process_turn_indices:
                 s_full = row_logprob_scores[start + len(process_turn_indices) * 2 - 1]
@@ -693,15 +693,15 @@ class LLMGenerationManager:
             deleted_scores = [s_full] * num_turns
             raw_scores = [0.0] * num_turns
             for offset, turn_idx in enumerate(process_turn_indices):
-                if lapo_score_direction == "backward":
+                if lotapo_score_direction == "backward":
                     full_idx = start
                     baseline_idx = start + 1 + offset
                 else:
                     baseline_idx = start + 2 * offset
                     full_idx = baseline_idx + 1
                 s_minus = row_logprob_scores[baseline_idx]
-                raw = self._compute_lapo_raw_score(
-                    lapo_score_type,
+                raw = self._compute_lotapo_raw_score(
+                    lotapo_score_type,
                     full_idx=full_idx,
                     minus_idx=baseline_idx,
                     row_logprob_scores=row_logprob_scores,
@@ -722,13 +722,13 @@ class LLMGenerationManager:
 
         total_variants = len(row_score_spans)
         total_rewards = sum(len(rewards) for rewards in turn_ig_rewards)
-        print(f"[Search-R1 Counterfactual IG] vectorized {lapo_score_direction}/{lapo_score_type}: {len(row_meta)} samples, {total_variants} variants, {total_rewards} turn rewards, 1 compute_log_prob call")
+        print(f"[Search-R1 Counterfactual IG] vectorized {lotapo_score_direction}/{lotapo_score_type}: {len(row_meta)} samples, {total_variants} variants, {total_rewards} turn rewards, 1 compute_log_prob call")
         return {
             'turn_ig_rewards': turn_ig_rewards,
             'raw_ig_values': raw_ig_values,
             'raw_process_scores': raw_process_scores,
-            'lapo_score_type': [lapo_score_type for _ in range(batch_size)],
-            'lapo_score_direction': [lapo_score_direction for _ in range(batch_size)],
+            'lotapo_score_type': [lotapo_score_type for _ in range(batch_size)],
+            'lotapo_score_direction': [lotapo_score_direction for _ in range(batch_size)],
             'final_rewards': final_rewards,
             'ig_enabled': ig_enabled,
             'ig_target_sources': ig_target_sources,

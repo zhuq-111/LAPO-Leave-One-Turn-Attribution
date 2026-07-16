@@ -1,4 +1,4 @@
-# Modifications Copyright 2026 LAPO Authors
+# Modifications Copyright 2026 LOTAPO Authors
 # Licensed under the Apache License, Version 2.0. See LICENSE in the project root.
 
 data:
@@ -160,10 +160,10 @@ algorithm:
   use_counterfactual_ig: false
   lambda_ig: 0.5
   ig_eps: 1e-6
-  use_lapo_turn_gate: true
+  use_lotapo_turn_gate: true
   disable_old_gt_ig: true
-  lapo_score_type: logprob
-  lapo_score_direction: backward
+  lotapo_score_type: logprob
+  lotapo_score_direction: backward
   kl_penalty: kl  # how to estimate kl divergence
   kl_ctrl:
     type: fixed

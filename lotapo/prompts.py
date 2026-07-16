@@ -1,4 +1,4 @@
-# Copyright 2026 LAPO Authors
+# Copyright 2026 LOTAPO Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Prompt templates reported in Appendix B of the LAPO paper."""
+"""Prompt templates reported in Appendix B of the LOTAPO paper."""
 
 
 AGENT_PROMPT_TEMPLATE = """You are answering a question that may require external search.

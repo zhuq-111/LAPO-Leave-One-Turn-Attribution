@@ -1,5 +1,5 @@
 # Copyright 2024 Bytedance Ltd. and/or its affiliates
-# Modifications Copyright 2026 LAPO Authors
+# Modifications Copyright 2026 LOTAPO Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import datasets
 
 from verl.utils.hdfs_io import copy, makedirs
 import argparse
-from lapo.prompts import build_agent_prompt
+from lotapo.prompts import build_agent_prompt
 
 
 def make_prefix(dp, template_type):

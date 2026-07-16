@@ -1,4 +1,4 @@
-# Copyright 2026 LAPO Authors
+# Copyright 2026 LOTAPO Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import unittest
 
 import numpy as np
 
-from lapo.algorithm import (
+from lotapo.algorithm import (
     add_process_advantage,
     build_process_advantages,
     replace_token_span,
@@ -24,7 +24,7 @@ from lapo.algorithm import (
 )
 
 
-class LapoAlgorithmTest(unittest.TestCase):
+class LotapoAlgorithmTest(unittest.TestCase):
     def test_delete_placeholder_preserves_downstream_context(self):
         context = [10, 11, 20, 21, 30, 31]
         self.assertEqual(

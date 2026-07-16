@@ -1,4 +1,4 @@
-# Copyright 2026 LAPO Authors
+# Copyright 2026 LOTAPO Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -370,8 +370,8 @@ def main(config):
         use_counterfactual_ig=True,
         ig_eps=config.algorithm.ig_eps,
         disable_old_gt_ig=True,
-        lapo_score_type=getattr(config.algorithm, "lapo_score_type", "logprob"),
-        lapo_score_direction=getattr(config.algorithm, "lapo_score_direction", "backward"),
+        lotapo_score_type=getattr(config.algorithm, "lotapo_score_type", "logprob"),
+        lotapo_score_direction=getattr(config.algorithm, "lotapo_score_direction", "backward"),
     )
     manager = LLMGenerationManager(tokenizer, actor_rollout, gen_config)
     gen_batch = batch.pop(batch_keys=["input_ids", "attention_mask", "position_ids"])

@@ -1,4 +1,4 @@
-# Copyright 2026 LAPO Authors
+# Copyright 2026 LOTAPO Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Core numerical operations for LAPO process supervision.
+"""Core numerical operations for LOTAPO process supervision.
 
 This module deliberately contains no trainer or distributed-runtime dependencies.  Keeping
 the equations here makes the implementation easy to audit against Section 3.3 of the paper
@@ -37,7 +37,7 @@ def replace_token_span(
 
 @dataclass(frozen=True)
 class ProcessAdvantages:
-    """Intermediate and final values from LAPO process-advantage construction."""
+    """Intermediate and final values from LOTAPO process-advantage construction."""
 
     scales: np.ndarray
     bounded: list[np.ndarray]

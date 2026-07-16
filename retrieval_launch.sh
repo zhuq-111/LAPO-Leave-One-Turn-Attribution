@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2026 LAPO Authors
+# Copyright 2026 LOTAPO Authors
 # Licensed under the Apache License, Version 2.0. See LICENSE in the project root.
 
 set -euo pipefail
@@ -8,7 +8,7 @@ set -euo pipefail
 : "${CORPUS_PATH:?Set CORPUS_PATH to the Wikipedia JSONL corpus}"
 
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
-python -m lapo.search.retrieval_server \
+python -m lotapo.search.retrieval_server \
   --index_path "$INDEX_PATH" \
   --corpus_path "$CORPUS_PATH" \
   --topk 3 \

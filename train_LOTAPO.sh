@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2026 LAPO Authors
+# Copyright 2026 LOTAPO Authors
 # Licensed under the Apache License, Version 2.0. See LICENSE in the project root.
 
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0,1,2,3,4,5,6,7}"
@@ -34,10 +34,10 @@ if [[ "${USE_WANDB_PROXY:-0}" != "1" ]]; then
     export no_proxy="${no_proxy:+$no_proxy,}api.wandb.ai,wandb.ai,*.wandb.ai"
 fi
 
-WAND_PROJECT="${WAND_PROJECT:-LAPO}"
+WAND_PROJECT="${WAND_PROJECT:-LOTAPO}"
 
 export BASE_MODEL="${BASE_MODEL:-Qwen/Qwen2.5-3B-Instruct}"
-export EXPERIMENT_NAME="${EXPERIMENT_NAME:-LAPO/backward-logprob-lapo-lambda0.5-turn3}"
+export EXPERIMENT_NAME="${EXPERIMENT_NAME:-LOTAPO/backward-logprob-lotapo-lambda0.5-turn3}"
 # export BASE_MODEL='Qwen/Qwen2.5-3B-Instruct'
 # export EXPERIMENT_NAME=nq-search-r1-grpo-qwen2.5-3b-it-em
 # set -x
@@ -46,13 +46,13 @@ export VLLM_ATTENTION_BACKEND=XFORMERS # vllm + qwen2-7b with flash_attn has som
 # max_prompt_length = (config['training']['max_start_length'] + config['training']['max_response_length'] * (config['training']['max_turns'] - 1) + config['training']['max_obs_length'] * config['training']['max_turns'])
 mkdir -p "$(dirname "$EXPERIMENT_NAME.log")"
 
-# LAPO score examples:
-#   algorithm.lapo_score_direction=backward algorithm.lapo_score_type=logprob
-#   algorithm.lapo_score_direction=backward algorithm.lapo_score_type=kl
-#   algorithm.lapo_score_direction=backward algorithm.lapo_score_type=entropy
-#   algorithm.lapo_score_direction=forward algorithm.lapo_score_type=logprob
-#   algorithm.lapo_score_direction=forward algorithm.lapo_score_type=kl
-#   algorithm.lapo_score_direction=forward algorithm.lapo_score_type=entropy
+# LOTAPO score examples:
+#   algorithm.lotapo_score_direction=backward algorithm.lotapo_score_type=logprob
+#   algorithm.lotapo_score_direction=backward algorithm.lotapo_score_type=kl
+#   algorithm.lotapo_score_direction=backward algorithm.lotapo_score_type=entropy
+#   algorithm.lotapo_score_direction=forward algorithm.lotapo_score_type=logprob
+#   algorithm.lotapo_score_direction=forward algorithm.lotapo_score_type=kl
+#   algorithm.lotapo_score_direction=forward algorithm.lotapo_score_type=entropy
 PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     data.train_files=$DATA_DIR/train.parquet \
     data.val_files=$DATA_DIR/valid.parquet \
@@ -92,10 +92,10 @@ PYTHONUNBUFFERED=1 python3 -m verl.trainer.main_ppo \
     algorithm.use_counterfactual_ig=true \
     algorithm.lambda_ig=0.5 \
     algorithm.ig_eps=1e-6 \
-    algorithm.use_lapo_turn_gate=true \
+    algorithm.use_lotapo_turn_gate=true \
     algorithm.disable_old_gt_ig=true \
-    algorithm.lapo_score_type=logprob \
-    algorithm.lapo_score_direction=backward \
+    algorithm.lotapo_score_type=logprob \
+    algorithm.lotapo_score_direction=backward \
     actor_rollout_ref.rollout.n_agent=5 \
     actor_rollout_ref.rollout.temperature=1 \
     actor_rollout_ref.actor.state_masking=true \

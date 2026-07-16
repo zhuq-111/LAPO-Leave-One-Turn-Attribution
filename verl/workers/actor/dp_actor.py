@@ -107,7 +107,7 @@ class DataParallelPPOActor(BasePPOActor):
 
                 logits = None
                 if return_logits and self.use_ulysses_sp:
-                    raise NotImplementedError("LAPO logits-based scoring is not implemented with Ulysses sequence parallelism.")
+                    raise NotImplementedError("LOTAPO logits-based scoring is not implemented with Ulysses sequence parallelism.")
 
                 # gather log_prob if sp > 1
                 if self.use_ulysses_sp:
@@ -187,8 +187,8 @@ class DataParallelPPOActor(BasePPOActor):
         micro_batch_size = data.meta_info['micro_batch_size']
         temperature = data.meta_info['temperature']  # temperature must be in the data.meta_info to avoid slient error
         use_dynamic_bsz = data.meta_info['use_dynamic_bsz']
-        return_logits = bool(data.meta_info.get('return_logits_for_lapo', False))
-        return_entropy = bool(data.meta_info.get('return_entropy_for_lapo', False))
+        return_logits = bool(data.meta_info.get('return_logits_for_lotapo', False))
+        return_entropy = bool(data.meta_info.get('return_entropy_for_lotapo', False))
 
         select_keys = ['responses', 'input_ids', 'attention_mask', 'position_ids']
         batch = data.select(batch_keys=select_keys).batch

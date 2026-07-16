@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2026 LAPO Authors
+# Copyright 2026 LOTAPO Authors
 # Licensed under the Apache License, Version 2.0. See LICENSE in the project root.
 
 WORK_DIR=your/work/dir

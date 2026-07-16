@@ -1,5 +1,5 @@
 # Copyright 2024 Bytedance Ltd. and/or its affiliates
-# Modifications Copyright 2026 LAPO Authors
+# Modifications Copyright 2026 LOTAPO Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ from verl.utils.reward_score import qa_em
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 import re
 import numpy as np
-from lapo.algorithm import (
+from lotapo.algorithm import (
     add_process_advantage,
     build_process_advantages,
     standardize_outcomes,
@@ -55,9 +55,9 @@ class RewardManager():
         self.algorithm_config = algorithm_config
         self.use_counterfactual_ig = bool(getattr(algorithm_config, 'use_counterfactual_ig', False)) if algorithm_config is not None else False
         self.ig_eps = float(getattr(algorithm_config, 'ig_eps', 1e-6)) if algorithm_config is not None else 1e-6
-        self.use_lapo_turn_gate = bool(getattr(algorithm_config, 'use_lapo_turn_gate', True)) if algorithm_config is not None else True
-        self.lapo_score_type = str(getattr(algorithm_config, 'lapo_score_type', 'logprob')) if algorithm_config is not None else 'logprob'
-        self.lapo_score_direction = str(getattr(algorithm_config, 'lapo_score_direction', 'backward')) if algorithm_config is not None else 'backward'
+        self.use_lotapo_turn_gate = bool(getattr(algorithm_config, 'use_lotapo_turn_gate', True)) if algorithm_config is not None else True
+        self.lotapo_score_type = str(getattr(algorithm_config, 'lotapo_score_type', 'logprob')) if algorithm_config is not None else 'logprob'
+        self.lotapo_score_direction = str(getattr(algorithm_config, 'lotapo_score_direction', 'backward')) if algorithm_config is not None else 'backward'
 
     def __call__(self, data: DataProto, info_gain_rewards=None):
         """We will expand this function gradually based on the available datasets"""
@@ -237,7 +237,7 @@ class RewardManager():
             valid_non_info = attention_mask[i] & info_mask[i]
             normalized_turn_rewards = np.array(normalized_ig_rows[i], dtype=np.float32)
             final_token_adv = float(sample_adv[i])
-            if self.use_lapo_turn_gate:
+            if self.use_lotapo_turn_gate:
                 process_turn_rewards = process.gated[i]
             else:
                 process_turn_rewards = normalized_turn_rewards
@@ -281,30 +281,30 @@ class RewardManager():
         target_sources = list(data.non_tensor_batch.get('ig_target_sources', []))
         valid_rewards = reward_tensor[attention_mask]
         data.meta_info['cf_ig_metrics'] = {
-            'lapo/raw_turn_score_mean': float(np.mean(raw_scores)) if raw_scores else 0.0,
-            'lapo/raw_turn_score_std': float(np.std(raw_scores)) if len(raw_scores) > 1 else 0.0,
-            'lapo/raw_turn_score_min': float(np.min(raw_scores)) if raw_scores else 0.0,
-            'lapo/raw_turn_score_max': float(np.max(raw_scores)) if raw_scores else 0.0,
-            'lapo/nonzero_raw_turn_score_ratio': float(np.mean([abs(x) > self.ig_eps for x in raw_scores])) if raw_scores else 0.0,
-            'lapo/signed_turn_ig_mean': float(np.mean(signed_igs)) if signed_igs else 0.0,
-            'lapo/signed_turn_ig_min': float(np.min(signed_igs)) if signed_igs else 0.0,
-            'lapo/signed_turn_ig_max': float(np.max(signed_igs)) if signed_igs else 0.0,
-            'lapo/signed_ig_positive_turn_ratio': float(np.mean([x > self.ig_eps for x in signed_igs])) if signed_igs else 0.0,
-            'lapo/signed_ig_negative_turn_ratio': float(np.mean([x < -self.ig_eps for x in signed_igs])) if signed_igs else 0.0,
-            'lapo/normalized_turn_ig_mean': float(np.mean(normalized_igs)) if normalized_igs else 0.0,
-            'lapo/normalized_turn_ig_min': float(np.min(normalized_igs)) if normalized_igs else 0.0,
-            'lapo/normalized_turn_ig_max': float(np.max(normalized_igs)) if normalized_igs else 0.0,
-            'lapo/credit_weight_mean': float(np.mean(credit_weights)) if credit_weights else 0.0,
-            'lapo/credit_active_ratio': float(np.mean([x > self.ig_eps for x in credit_weights])) if credit_weights else 0.0,
-            'lapo/active_credit_weight_mean': float(np.mean(active_credit_weights)) if active_credit_weights else 0.0,
-            'lapo/credit_advantage_mean': float(np.mean(ig_advantages)) if ig_advantages else 0.0,
-            'lapo/credit_advantage_min': float(np.min(ig_advantages)) if ig_advantages else 0.0,
-            'lapo/credit_advantage_max': float(np.max(ig_advantages)) if ig_advantages else 0.0,
-            'lapo/credit_advantage_positive_ratio': float(np.mean(positive_ig_credit_flags)) if positive_ig_credit_flags else 0.0,
-            'lapo/credit_advantage_negative_ratio': float(np.mean(negative_ig_credit_flags)) if negative_ig_credit_flags else 0.0,
-            'lapo/ig_enabled_ratio': float(np.array(data.non_tensor_batch.get('ig_enabled', np.zeros(batch_size))).astype(np.float32).mean()),
-            'lapo/use_turn_gate': float(self.use_lapo_turn_gate),
-            'lapo/ground_truth_target_ratio': float(np.mean([x == 'ground_truth' for x in target_sources])) if target_sources else 0.0,
+            'lotapo/raw_turn_score_mean': float(np.mean(raw_scores)) if raw_scores else 0.0,
+            'lotapo/raw_turn_score_std': float(np.std(raw_scores)) if len(raw_scores) > 1 else 0.0,
+            'lotapo/raw_turn_score_min': float(np.min(raw_scores)) if raw_scores else 0.0,
+            'lotapo/raw_turn_score_max': float(np.max(raw_scores)) if raw_scores else 0.0,
+            'lotapo/nonzero_raw_turn_score_ratio': float(np.mean([abs(x) > self.ig_eps for x in raw_scores])) if raw_scores else 0.0,
+            'lotapo/signed_turn_ig_mean': float(np.mean(signed_igs)) if signed_igs else 0.0,
+            'lotapo/signed_turn_ig_min': float(np.min(signed_igs)) if signed_igs else 0.0,
+            'lotapo/signed_turn_ig_max': float(np.max(signed_igs)) if signed_igs else 0.0,
+            'lotapo/signed_ig_positive_turn_ratio': float(np.mean([x > self.ig_eps for x in signed_igs])) if signed_igs else 0.0,
+            'lotapo/signed_ig_negative_turn_ratio': float(np.mean([x < -self.ig_eps for x in signed_igs])) if signed_igs else 0.0,
+            'lotapo/normalized_turn_ig_mean': float(np.mean(normalized_igs)) if normalized_igs else 0.0,
+            'lotapo/normalized_turn_ig_min': float(np.min(normalized_igs)) if normalized_igs else 0.0,
+            'lotapo/normalized_turn_ig_max': float(np.max(normalized_igs)) if normalized_igs else 0.0,
+            'lotapo/credit_weight_mean': float(np.mean(credit_weights)) if credit_weights else 0.0,
+            'lotapo/credit_active_ratio': float(np.mean([x > self.ig_eps for x in credit_weights])) if credit_weights else 0.0,
+            'lotapo/active_credit_weight_mean': float(np.mean(active_credit_weights)) if active_credit_weights else 0.0,
+            'lotapo/credit_advantage_mean': float(np.mean(ig_advantages)) if ig_advantages else 0.0,
+            'lotapo/credit_advantage_min': float(np.min(ig_advantages)) if ig_advantages else 0.0,
+            'lotapo/credit_advantage_max': float(np.max(ig_advantages)) if ig_advantages else 0.0,
+            'lotapo/credit_advantage_positive_ratio': float(np.mean(positive_ig_credit_flags)) if positive_ig_credit_flags else 0.0,
+            'lotapo/credit_advantage_negative_ratio': float(np.mean(negative_ig_credit_flags)) if negative_ig_credit_flags else 0.0,
+            'lotapo/ig_enabled_ratio': float(np.array(data.non_tensor_batch.get('ig_enabled', np.zeros(batch_size))).astype(np.float32).mean()),
+            'lotapo/use_turn_gate': float(self.use_lotapo_turn_gate),
+            'lotapo/ground_truth_target_ratio': float(np.mean([x == 'ground_truth' for x in target_sources])) if target_sources else 0.0,
             'reward/outcome_f1_mean': float(final_rewards.mean()) if final_rewards.size else 0.0,
             'reward/outcome_f1_std': float(final_rewards.std()) if final_rewards.size > 1 else 0.0,
             'reward/outcome_f1_min': float(final_rewards.min()) if final_rewards.size else 0.0,

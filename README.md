@@ -1,18 +1,18 @@
-# LAPO
+# LOTAPO
 
-This repository implements **LAPO: Leave-One-Turn Attribution for Self-Generated
+This repository implements **LOTAPO: Leave-One-Turn Attribution for Self-Generated
 Process Rewards in Multi-Turn Search Reasoning** on top of VERL/Search-R1.
 
 ## Algorithm-to-code map
 
 ```text
-LAPO/
-├── lapo/
+LOTAPO/
+├── lotapo/
 │   ├── llm_agent/
 │   │   └── generation.py
 │   │       └── LLMGenerationManager
 │   │           ├── Multi-turn search rollout
-│   │           ├── _score_lapo_rows
+│   │           ├── _score_lotapo_rows
 │   │           │   └── Gold-answer mean log-likelihood
 │   │           └── _compute_counterfactual_ig_rewards
 │   │               └── Backward [DELETE] counterfactual
@@ -31,7 +31,7 @@ LAPO/
                 └── Clipped GRPO optimization
 ```
 
-The numerical LAPO equations are isolated in `lapo/algorithm.py`; they do not import
+The numerical LOTAPO equations are isolated in `lotapo/algorithm.py`; they do not import
 Ray, Torch, or trainer code and can be unit-tested independently.
 
 ## Training environment
@@ -41,7 +41,7 @@ PyTorch 2.4.0 (CUDA 12.1), vLLM 0.6.3, and NVIDIA A100 GPUs. Create it with:
 
 ```bash
 conda env create -f environment.yml
-conda activate lapo
+conda activate lotapo
 
 # Install PyTorch first so flash-attn can compile against the active Torch/CUDA ABI.
 python -m pip install torch==2.4.0 torchvision==0.19.0
@@ -80,7 +80,7 @@ configuration: Qwen2.5-3B-Instruct, five trajectories per question, three search
 ```bash
 BASE_MODEL=Qwen/Qwen2.5-3B-Instruct \
 DATA_DIR=data/data_4full \
-bash train_LAPO.sh
+bash train_LOTAPO.sh
 ```
 
 ## Tests
@@ -98,7 +98,7 @@ Add a pinned environment or lock file before publishing.
 
 ## License
 
-Copyright 2026 LAPO Authors.
+Copyright 2026 LOTAPO Authors.
 
 This project is licensed under the Apache License 2.0. See [LICENSE](LICENSE)
 for the license terms and [NOTICE](NOTICE) for attribution of upstream software.

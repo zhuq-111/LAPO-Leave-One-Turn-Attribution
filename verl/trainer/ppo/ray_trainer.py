@@ -1,5 +1,5 @@
 # Copyright 2024 Bytedance Ltd. and/or its affiliates
-# Modifications Copyright 2026 LAPO Authors
+# Modifications Copyright 2026 LOTAPO Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -488,8 +488,8 @@ class RayPPOTrainer(object):
             use_counterfactual_ig=False,
             ig_eps=getattr(self.config.algorithm, 'ig_eps', 1e-6),
             disable_old_gt_ig=getattr(self.config.algorithm, 'disable_old_gt_ig', True),
-            lapo_score_type=getattr(self.config.algorithm, 'lapo_score_type', 'logprob'),
-            lapo_score_direction=getattr(self.config.algorithm, 'lapo_score_direction', 'backward'),
+            lotapo_score_type=getattr(self.config.algorithm, 'lotapo_score_type', 'logprob'),
+            lotapo_score_direction=getattr(self.config.algorithm, 'lotapo_score_direction', 'backward'),
         )
 
         # Agent config preparation
@@ -745,8 +745,8 @@ class RayPPOTrainer(object):
             use_counterfactual_ig=getattr(self.config.algorithm, 'use_counterfactual_ig', False),
             ig_eps=getattr(self.config.algorithm, 'ig_eps', 1e-6),
             disable_old_gt_ig=getattr(self.config.algorithm, 'disable_old_gt_ig', True),
-            lapo_score_type=getattr(self.config.algorithm, 'lapo_score_type', 'logprob'),
-            lapo_score_direction=getattr(self.config.algorithm, 'lapo_score_direction', 'backward'),
+            lotapo_score_type=getattr(self.config.algorithm, 'lotapo_score_type', 'logprob'),
+            lotapo_score_direction=getattr(self.config.algorithm, 'lotapo_score_direction', 'backward'),
         )
 
         generation_manager = LLMGenerationManager(

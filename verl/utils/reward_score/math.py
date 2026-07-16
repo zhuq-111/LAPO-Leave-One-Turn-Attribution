@@ -1,5 +1,5 @@
 # Copyright 2024 Bytedance Ltd. and/or its affiliates
-# Modifications Copyright 2026 LAPO Authors
+# Modifications Copyright 2026 LOTAPO Authors
 # Copyright 2022 EleutherAI and the HuggingFace Inc. team. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
